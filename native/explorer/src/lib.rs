@@ -1,5 +1,5 @@
 // MiMalloc won´t compile on Windows with the GCC compiler.
-// On Linux with Musl it won´t load correctly.
+// O Linux with Musl it won´t load correctly.
 #[cfg(not(any(
     all(windows, target_env = "gnu"),
     all(target_os = "linux", target_env = "musl")
@@ -136,6 +136,7 @@ rustler::init!(
         expr_hour,
         expr_minute,
         expr_second,
+        expr_date_diff,
         expr_strptime,
         expr_strftime,
         expr_fill_missing_with_strategy,
@@ -289,6 +290,7 @@ rustler::init!(
         s_hour,
         s_minute,
         s_second,
+        s_date_diff,
         s_strptime,
         s_strftime,
         s_downcase,

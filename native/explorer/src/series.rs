@@ -1315,6 +1315,16 @@ pub fn s_second(s: ExSeries) -> Result<ExSeries, ExplorerError> {
 }
 
 #[rustler::nif(schedule = "DirtyCpu")]
+pub fn s_date_diff(left: ExSeries, right: ExSeries) -> Result<ExSeries, ExplorerError> {
+    let left_series = left.clone_inner();
+    let right_series = right.clone_inner();
+    let series = (left_series - right_series)
+        .duration()?
+        .cast(&DataType::Int64)?;
+    Ok(ExSeries::new(series / 86400000))
+}
+
+#[rustler::nif(schedule = "DirtyCpu")]
 pub fn s_strptime(s: ExSeries, format_string: &str) -> Result<ExSeries, ExplorerError> {
     let s1 = s
         .utf8()?

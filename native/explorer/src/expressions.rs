@@ -843,3 +843,14 @@ pub fn expr_second(expr: ExExpr) -> ExExpr {
 
     ExExpr::new(expr.dt().second().cast(DataType::Int64))
 }
+
+#[rustler::nif]
+pub fn expr_date_diff(left: ExExpr, right: ExExpr) -> ExExpr {
+    let left_expr = left.clone_inner();
+    let right_expr = right.clone_inner();
+
+    ExExpr::new(
+        (left_expr - right_expr).cast(DataType::Int64)
+            / Expr::Literal(LiteralValue::Int64(86400000)),
+    )
+}

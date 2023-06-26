@@ -120,7 +120,8 @@ defmodule Explorer.Backend.LazySeries do
     year: 1,
     hour: 1,
     minute: 1,
-    second: 1
+    second: 1,
+    date_diff: 2
   ]
 
   @comparison_operations [:equal, :not_equal, :greater, :greater_equal, :less, :less_equal]
@@ -563,6 +564,13 @@ defmodule Explorer.Backend.LazySeries do
   @impl true
   def second(%Series{} = s) do
     data = new(:second, [lazy_series!(s)])
+
+    Backend.Series.new(data, :integer)
+  end
+
+  @impl true
+  def date_diff(%Series{} = s1, %Series{} = s2) do
+    data = new(:date_diff, [lazy_series!(s1), lazy_series!(s2)])
 
     Backend.Series.new(data, :integer)
   end

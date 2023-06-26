@@ -232,6 +232,7 @@ defmodule Explorer.Backend.Series do
   @callback hour(s) :: s
   @callback minute(s) :: s
   @callback second(s) :: s
+  @callback date_diff(s, s) :: s
 
   # Functions
 

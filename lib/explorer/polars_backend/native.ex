@@ -336,6 +336,7 @@ defmodule Explorer.PolarsBackend.Native do
   def s_hour(_s), do: err()
   def s_minute(_s), do: err()
   def s_second(_s), do: err()
+  def s_date_diff(_s1, _s2), do: err()
   def s_sin(_s), do: err()
   def s_cos(_s), do: err()
   def s_tan(_s), do: err()

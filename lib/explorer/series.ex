@@ -4268,6 +4268,23 @@ defmodule Explorer.Series do
     do: dtype_error("minute/1", dtype, [:datetime])
 
   @doc """
+  Takes the day difference between left and right
+  ## Supported dtypes
+    * `:date`
+  ## Examples
+  """
+  @doc type: :element_wise
+  @spec date_diff(left :: Series.t() | Date.t(), right :: Series.t() | Date.t()) :: Series.t()
+  def date_diff(%Series{dtype: :date} = left, %Series{dtype: :date} = right) do
+    apply_series_list(:date_diff, [left, right])
+  end
+
+  def date_diff(_left, _right) do
+    raise ArgumentError,
+          "date_diff/2 expect a series of type :date for both its arguments"
+  end
+
+  @doc """
   Returns a day-of-week number starting from Monday = 1. (ISO 8601 weekday number)
 
   ## Examples

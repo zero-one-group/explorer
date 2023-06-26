@@ -26,6 +26,7 @@ defmodule Explorer.PolarsBackend.Expression do
     hour: 1,
     minute: 1,
     second: 1,
+    date_diff: 2,
     distinct: 1,
     divide: 2,
     equal: 2,

@@ -3834,6 +3834,14 @@ defmodule Explorer.SeriesTest do
     end
   end
 
+  describe "date_diff/2" do
+    test "can take date diff in days of two series" do
+      left = Series.from_list([~D[2023-01-15], ~D[2022-02-16], ~D[2021-03-20], nil])
+      right = Series.from_list([~D[2023-01-16], ~D[2022-02-15], ~D[2021-03-20], nil])
+      assert Series.date_diff(left, right) |> Series.to_list() == [-1, 1, 0, nil]
+    end
+  end
+
   describe "strptime/2 and strftime/2" do
     test "parse datetime from string" do
       series = Series.from_list(["2023-01-05 12:34:56", "XYZ", nil])

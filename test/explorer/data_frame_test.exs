@@ -1443,6 +1443,22 @@ defmodule Explorer.DataFrameTest do
              }
     end
 
+    test "can take date diff in days of two columns" do
+      df =
+        DF.new(
+          a: [~D[2023-01-15], ~D[2022-02-16], ~D[2021-03-20], nil],
+          b: [~D[2023-01-16], ~D[2022-02-15], ~D[2021-03-20], nil]
+        )
+
+      df1 = DF.mutate(df, c: date_diff(a, b))
+
+      assert DF.to_columns(df1, atom_keys: true) == %{
+               a: [~D[2023-01-15], ~D[2022-02-16], ~D[2021-03-20], nil],
+               b: [~D[2023-01-16], ~D[2022-02-15], ~D[2021-03-20], nil],
+               c: [-1, 1, 0, nil]
+             }
+    end
+
     test "add columns with date and datetime operations" do
       df =
         DF.new(
