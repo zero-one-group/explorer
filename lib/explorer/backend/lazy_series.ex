@@ -512,13 +512,10 @@ defmodule Explorer.Backend.LazySeries do
   end
 
   @impl true
-  def select(%Series{} = predicate, %Series{} = on_true, %Series{} = on_false) do
-    args = [
-      series_or_lazy_series!(predicate),
-      series_or_lazy_series!(on_true),
-      series_or_lazy_series!(on_false)
-    ]
-
+  def select(%Series{} = predicate, on_true, on_false) do
+    on_true = to_series!(on_true)
+    on_false = to_series!(on_false)
+    args = [series_or_lazy_series!(predicate), on_true.data, on_false.data]
     data = new(:select, args, aggregations?(args))
 
     dtype =
@@ -529,6 +526,23 @@ defmodule Explorer.Backend.LazySeries do
       end
 
     Backend.Series.new(data, dtype)
+  end
+
+  defp to_series!(%Series{} = series), do: series
+
+  defp to_series!(value) do
+    dtype =
+      case value do
+        %Series{dtype: dtype} -> dtype
+        v when is_integer(v) -> :integer
+        v when is_number(v) -> :float
+        v when v in [:nan, :infinity, :neg_infinity] -> :float
+        v when is_binary(v) -> :string
+        v when is_boolean(v) -> :boolean
+        _ -> raise ArgumentError, "<<TODO>>"
+      end
+
+    from_list([value], dtype)
   end
 
   @impl true

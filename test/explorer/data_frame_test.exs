@@ -1532,6 +1532,22 @@ defmodule Explorer.DataFrameTest do
                "k" => :integer
              }
     end
+
+    test "add columns with select/3" do
+      df = DF.new(a: [1, 2, 3], b: ["a", "b", "c"], c: [true, false, nil])
+
+      df1 = df |> DF.mutate(x: select(a <= 2.5, a, 2.5))
+      assert Series.to_list(df1[:x]) == [1.0, 2.0, 2.5]
+
+      df2 = df |> DF.mutate(x: select(a <= 2.5, 2.5, a))
+      assert Series.to_list(df2[:x]) == [2.5, 2.5, 3.0]
+
+      df3 = df |> DF.mutate(x: select(c, false, c))
+      assert Series.to_list(df3[:x]) == [false, false, nil]
+
+      df4 = df |> DF.mutate(x: select(b == "a", "x", b))
+      assert Series.to_list(df4[:x]) == ["x", "b", "c"]
+    end
   end
 
   describe "arrange/3" do

@@ -1139,25 +1139,55 @@ defmodule Explorer.Series do
   @doc type: :element_wise
   @spec select(predicate :: Series.t(), on_true :: Series.t(), on_false :: Series.t()) ::
           Series.t()
-  def select(
-        %Series{dtype: predicate_dtype} = predicate,
-        %Series{dtype: on_true_dtype} = on_true,
-        %Series{dtype: on_false_dtype} = on_false
-      ) do
+  def select(%Series{dtype: predicate_dtype} = predicate, on_true, on_false) do
     if predicate_dtype != :boolean do
       raise ArgumentError,
             "Explorer.Series.select/3 expect the first argument to be a series of booleans, got: #{inspect(predicate_dtype)}"
     end
 
-    cond do
-      K.and(is_numeric_dtype(on_true_dtype), is_numeric_dtype(on_false_dtype)) ->
-        apply_series_list(:select, [predicate, on_true, on_false])
+    [on_true, on_false] = matched_dtype_args!(on_true, on_false)
+    apply_series_list(:select, [predicate, on_true, on_false])
+  end
 
-      on_true_dtype == on_false_dtype ->
-        apply_series_list(:select, [predicate, on_true, on_false])
+  defp matched_dtype_args!(left, right) do
+    case {left, right} do
+      {%Series{dtype: left_dtype}, %Series{dtype: right_dtype}}
+      when K.and(is_numeric_dtype(left_dtype), is_numeric_dtype(right_dtype)) ->
+        [left, right]
 
-      true ->
-        dtype_mismatch_error("select/3", on_true_dtype, on_false_dtype)
+      {%Series{dtype: left_dtype}, %Series{dtype: right_dtype}}
+      when left_dtype == right_dtype ->
+        [left, right]
+
+      {%Series{dtype: dtype}, value}
+      when K.and(is_numeric_dtype(dtype), is_numerical(value)) ->
+        [left, right]
+
+      {value, %Series{dtype: dtype}}
+      when K.and(is_numeric_dtype(dtype), is_numerical(value)) ->
+        [left, right]
+
+      {%Series{dtype: dtype}, value}
+      when K.and(K.in(dtype, [:binary, :string]), is_binary(value)) ->
+        [left, from_list([value], dtype: dtype)]
+
+      {value, %Series{dtype: dtype}}
+      when K.and(K.in(dtype, [:binary, :string]), is_binary(value)) ->
+        [from_list([value], dtype: dtype), right]
+
+      {%Series{dtype: dtype}, value}
+      when K.and(dtype == :boolean, is_boolean(value)) ->
+        [left, right]
+
+      {value, %Series{dtype: dtype}}
+      when K.and(dtype == :boolean, is_boolean(value)) ->
+        [left, right]
+
+      {%Series{dtype: left_dtype}, %Series{dtype: right_dtype}} ->
+        dtype_mismatch_error("select/3", left_dtype, right_dtype)
+
+      {left, right} ->
+        dtype_mismatch_error("select/3", left, right)
     end
   end
 
